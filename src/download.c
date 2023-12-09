@@ -221,7 +221,16 @@ int ftp_retrieve_file(int sockfd, const char *file_path, int data_port, int data
     printf("RETR command response: %s", response);
 
     // Open a file to save the incoming data
-    file = fopen(file_path, "wb");
+
+    // Extract the filename from the file_path
+    const char *filename = strrchr(file_path, '/');
+    if (filename) {
+      filename++; // Move past the '/'
+    } else {
+      filename = file_path; // If no '/' found, use the entire file_path as the filename
+    }
+
+    file = fopen(filename, "wb");
     if (!file) {
         perror("Failed to open file on local system");
         close(data_sock);
