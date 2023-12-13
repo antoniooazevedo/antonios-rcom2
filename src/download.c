@@ -19,7 +19,7 @@ int parse_url(const char *url, URLParts *url_parts) {
         temp_ptr = temp_url; // No protocol specified
     }
 
-    // Extract the username and password if they are present
+    // Extract the username and password
     char *userinfo = strstr(temp_ptr, "@");
     if (userinfo) {
         *userinfo = '\0'; // Split the string at the '@'
@@ -50,7 +50,7 @@ int parse_url(const char *url, URLParts *url_parts) {
     struct addrinfo hints, *res;
     int status;
     memset(&hints, 0, sizeof(hints));
-    hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
+    hints.ai_family = AF_UNSPEC; 
     hints.ai_socktype = SOCK_STREAM;
 
     if ((status = getaddrinfo(url_parts->host, NULL, &hints, &res)) != 0) {
@@ -59,10 +59,10 @@ int parse_url(const char *url, URLParts *url_parts) {
     }
 
     void *addr;
-    if (res->ai_family == AF_INET) { // IPv4
+    if (res->ai_family == AF_INET) { 
         struct sockaddr_in *ipv4 = (struct sockaddr_in *)res->ai_addr;
         addr = &(ipv4->sin_addr);
-    } else { // IPv6
+    } else { 
         struct sockaddr_in6 *ipv6 = (struct sockaddr_in6 *)res->ai_addr;
         addr = &(ipv6->sin6_addr);
     }
@@ -70,7 +70,7 @@ int parse_url(const char *url, URLParts *url_parts) {
     // Convert the IP to a string and store it
     inet_ntop(res->ai_family, addr, url_parts->ip, sizeof(url_parts->ip));
 
-    freeaddrinfo(res); // Free the linked list
+    freeaddrinfo(res);
 
     return 0;
 }
@@ -138,7 +138,6 @@ int send_ftp_command(int sockfd, const char *cmd, char *response, size_t resp_si
     return bytes_received;
 }
 
-// Function to login to the FTP server
 int ftp_login(int sockfd, const char *username, const char *password) {
     char response[BUFFER_SIZE];
 
@@ -200,12 +199,8 @@ int enter_passive_mode(int sockfd, char *data_ip, int *data_port) {
     return 0; // Success
 }
 
-// Function to request a resource
 int ftp_retrieve_file(int sockfd, const char *file_path, int data_port, int data_sock) {
     char response[BUFFER_SIZE];
-    // char data_ip[INET_ADDRSTRLEN];
-    // int data_port;
-    // int data_sockfd;
     int bytes_received;
     FILE *file;
 
@@ -330,7 +325,6 @@ int main(int argc, char *argv[]) {
     }
 
     // Retrieve the file using RETR command
-    // You would need to handle the data connection in ftp_retrieve_file function
     if (ftp_retrieve_file(sock, url_parts.path, data_port, sock_data) == -1) {
         printf("Error retrieving file from FTP server\n");
         close(sock);
